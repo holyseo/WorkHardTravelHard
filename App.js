@@ -1,15 +1,68 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import theme from "./colors.js";
 
 export default function App() {
+  const [working, setWorking] = useState(true);
+  const [text, setText] = useState("");
+  const [todos, setTodos] = useState({});
+
+  const travel = () => setWorking(false);
+  const work = () => setWorking(true);
+  const onChangeText = (textInput) => {
+    setText(textInput);
+  };
+  const addToDo = () => {
+    const newTodos = { ...todos, [Date.now()]: { text, work: working } };
+    setTodos(newTodos);
+    setText("");
+  };
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <Text style={styles.btnText}>Work</Text>
-        <Text style={styles.btnText}>Travel</Text>
+        <TouchableOpacity onPress={work}>
+          <Text
+            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
+          >
+            Work
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={travel}>
+          <Text
+            style={{ ...styles.btnText, color: working ? theme.grey : "white" }}
+          >
+            Travel
+          </Text>
+        </TouchableOpacity>
       </View>
+      <TextInput
+        style={styles.input}
+        placeholder={
+          working ? "What is your primary goal" : "Where is your next stop?"
+        }
+        value={text}
+        onChangeText={onChangeText}
+        onSubmitEditing={addToDo}
+        returnKeyType="Done"
+      />
+      <ScrollView>
+        {Object.keys(todos).map((key, index) =>
+          working === todos[key].work ? (
+            <View key={index} style={styles.todos}>
+              <Text style={styles.todoText}>{todos[key].text}</Text>
+            </View>
+          ) : null
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -17,7 +70,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: theme.bg,
     paddingHorizontal: 20,
   },
   header: {
@@ -26,8 +79,27 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   btnText: {
-    color: "white",
     fontSize: 38,
     fontWeight: "800",
+    color: "white",
+  },
+  input: {
+    backgroundColor: "white",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    fontSize: 15,
+    marginVertical: 30,
+  },
+  todos: {
+    backgroundColor: "#1A1A1A",
+    marginBottom: 10,
+    padding: 20,
+    borderRadius: 8,
+  },
+  todoText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
