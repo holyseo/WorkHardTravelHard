@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -45,11 +46,26 @@ export default function App() {
     }
   };
 
+  const deleteTodo = (id) => {
+    Alert.alert("Delete item", "Are you sure to delete this item?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Confirm",
+        style: "destructive",
+        onPress: async () => {
+          const newTodos = { ...todos };
+          delete newTodos[id];
+          setTodos(newTodos);
+          await saveTodos(newTodos);
+        },
+      },
+    ]);
+  };
+
   const loadTodos = async () => {
     try {
       const todosInStorage = await AsyncStorage.getItem("@todos");
       setTodos(JSON.parse(todosInStorage));
-      console.log(todosInStorage);
     } catch (error) {
       console.log(error);
     }
@@ -89,6 +105,9 @@ export default function App() {
           working === todos[key].work ? (
             <View key={index} style={styles.todos}>
               <Text style={styles.todoText}>{todos[key].text}</Text>
+              <TouchableOpacity onPress={() => deleteTodo(key)}>
+                <Text>❌</Text>
+              </TouchableOpacity>
             </View>
           ) : null
         )}
@@ -126,6 +145,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 20,
     borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   todoText: {
     color: "white",
