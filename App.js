@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import theme from "./colors.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Fontisto } from "@expo/vector-icons";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -77,14 +78,20 @@ export default function App() {
       <View style={styles.header}>
         <TouchableOpacity onPress={work}>
           <Text
-            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
+            style={{
+              ...styles.btnText,
+              color: working ? "#353240" : theme.grey,
+            }}
           >
             Work
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={travel}>
           <Text
-            style={{ ...styles.btnText, color: working ? theme.grey : "white" }}
+            style={{
+              ...styles.btnText,
+              color: working ? theme.grey : "#ee8e1d",
+            }}
           >
             Travel
           </Text>
@@ -93,8 +100,9 @@ export default function App() {
       <TextInput
         style={styles.input}
         placeholder={
-          working ? "What is your primary goal" : "Where is your next stop?"
+          working ? "What is your primary goal?" : "Where is your next stop?"
         }
+        placeholderTextColor="white"
         value={text}
         onChangeText={onChangeText}
         onSubmitEditing={addToDo}
@@ -103,10 +111,21 @@ export default function App() {
       <ScrollView>
         {Object.keys(todos).map((key, index) =>
           working === todos[key].work ? (
-            <View key={index} style={styles.todos}>
+            <View
+              key={index}
+              style={{
+                ...styles.todos,
+                backgroundColor: working ? "#353240" : "#ee8e1d",
+              }}
+            >
               <Text style={styles.todoText}>{todos[key].text}</Text>
               <TouchableOpacity onPress={() => deleteTodo(key)}>
-                <Text>❌</Text>
+                <Fontisto
+                  name="trash"
+                  size={16}
+                  color={theme.trash}
+                  style={styles.trash}
+                />
               </TouchableOpacity>
             </View>
           ) : null
@@ -133,16 +152,17 @@ const styles = StyleSheet.create({
     color: "white",
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#e95160",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 30,
     fontSize: 15,
     marginVertical: 30,
+    color: "white",
   },
   todos: {
     backgroundColor: "#1A1A1A",
-    marginBottom: 10,
+    marginBottom: 15,
     padding: 20,
     borderRadius: 8,
     flexDirection: "row",
@@ -151,7 +171,10 @@ const styles = StyleSheet.create({
   },
   todoText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
+    lineHeight: 25,
+    width: "85%",
   },
+  trash: {},
 });
