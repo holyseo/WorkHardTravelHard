@@ -12,6 +12,7 @@ import {
 import theme from "./colors.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Fontisto } from "@expo/vector-icons";
+import { Checkbox } from "expo-checkbox";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -28,11 +29,21 @@ export default function App() {
     loadTodos();
   }, []);
 
+  const handleCheck = async (id) => {
+    todos[id].checked = !todos[id].checked;
+    const newTodos = { ...todos, [id]: todos[id] };
+    setTodos(newTodos);
+    await saveTodos(newTodos);
+  };
+
   const addToDo = async () => {
     if (text === "") {
       return;
     }
-    const newTodos = { ...todos, [Date.now()]: { text, work: working } };
+    const newTodos = {
+      ...todos,
+      [Date.now()]: { text, work: working, checked: false },
+    };
     setTodos(newTodos);
     await saveTodos(newTodos);
     setText("");
@@ -66,7 +77,9 @@ export default function App() {
   const loadTodos = async () => {
     try {
       const todosInStorage = await AsyncStorage.getItem("@todos");
-      setTodos(JSON.parse(todosInStorage));
+      if (todosInStorage) {
+        setTodos(JSON.parse(todosInStorage));
+      }
     } catch (error) {
       console.log(error);
     }
@@ -80,10 +93,10 @@ export default function App() {
           <Text
             style={{
               ...styles.btnText,
-              color: working ? "#353240" : theme.grey,
+              color: working ? "#009fa9" : theme.grey,
             }}
           >
-            Work
+            WORK
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={travel}>
@@ -93,7 +106,7 @@ export default function App() {
               color: working ? theme.grey : "#ee8e1d",
             }}
           >
-            Travel
+            TRAVEL
           </Text>
         </TouchableOpacity>
       </View>
@@ -102,7 +115,7 @@ export default function App() {
         placeholder={
           working ? "What is your primary goal?" : "Where is your next stop?"
         }
-        placeholderTextColor="white"
+        placeholderTextColor="#6E6E6E"
         value={text}
         onChangeText={onChangeText}
         onSubmitEditing={addToDo}
@@ -115,10 +128,24 @@ export default function App() {
               key={index}
               style={{
                 ...styles.todos,
-                backgroundColor: working ? "#353240" : "#ee8e1d",
+                backgroundColor: working ? "#009fa9" : "#ee8e1d",
               }}
             >
-              <Text style={styles.todoText}>{todos[key].text}</Text>
+              <Checkbox
+                onValueChange={() => handleCheck(key)}
+                value={todos[key].checked}
+                color={theme.check}
+              ></Checkbox>
+              <Text
+                style={{
+                  ...styles.todoText,
+                  textDecorationLine: todos[key].checked
+                    ? "line-through"
+                    : null,
+                }}
+              >
+                {todos[key].text}
+              </Text>
               <TouchableOpacity onPress={() => deleteTodo(key)}>
                 <Fontisto
                   name="trash"
@@ -152,13 +179,13 @@ const styles = StyleSheet.create({
     color: "white",
   },
   input: {
-    backgroundColor: "#e95160",
+    backgroundColor: "#c9c9c9",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 30,
-    fontSize: 15,
+    fontSize: 14,
     marginVertical: 30,
-    color: "white",
+    fontWeight: "500",
   },
   todos: {
     backgroundColor: "#1A1A1A",
@@ -174,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     lineHeight: 25,
-    width: "85%",
+    width: "80%",
   },
   trash: {},
 });
